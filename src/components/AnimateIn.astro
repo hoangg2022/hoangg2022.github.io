@@ -1,7 +1,7 @@
 ---
-// 通用入场动画包装组件
-// 用法：<AnimateIn delay={100}> <你的内容 /> </AnimateIn>
-// delay 单位毫秒，用于列表错开动画，默认 0
+// Component wrapper tạo hiệu ứng xuất hiện (entrance animation) dùng chung
+// Cách dùng: <AnimateIn delay={100}> <Nội dung của bạn /> </AnimateIn>
+// delay tính bằng mili-giây (ms), dùng để làm hiệu ứng xuất hiện so-le cho danh sách, mặc định là 0
 export interface Props {
   delay?: number;
 }
@@ -18,8 +18,8 @@ const { delay = 0 } = Astro.props;
 
 <style>
   .animate-in {
-    /* 入场动画：从中心向外缩放 + 淡入（涟漪水波扩散感） */
-    /* 静态态不隐藏（保持可见，避免切页背景闪现），动画播放时再淡入 */
+    /* Hiệu ứng xuất hiện: Phóng to từ tâm ra ngoài + Phóng lớn & Hiện dần (cảm giác sóng nước lan tỏa) */
+    /* Trạng thái tĩnh không ẩn hoàn toàn để tránh hiện tượng nhấp nháy background khi chuyển trang, animation chạy sẽ fade-in dần */
     transform: scale(0.6);
     animation: rippleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
@@ -30,7 +30,7 @@ const { delay = 0 } = Astro.props;
       transform: scale(0.6);
     }
     70% {
-      transform: scale(1.012); /* 水波轻微过冲（细腻） */
+      transform: scale(1.012); /* Hiệu ứng nảy nhẹ dạng sóng nước (tăng tính mượt mà) */
     }
     to {
       opacity: 1;
