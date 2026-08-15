@@ -1,5 +1,5 @@
 ---
-// 今日说法列表组件：卡片显示正文前 20 字，点击进入详情大卡片
+// Component danh sách nhật ký ngắn (Talk): Card hiển thị 20 ký tự đầu của nội dung, nhấn để xem chi tiết
 import { getCollection } from 'astro:content';
 import AnimateIn from './AnimateIn.astro';
 
@@ -7,11 +7,11 @@ const talks = (await getCollection('talk')).sort(
   (a, b) => (b.data.update ?? '').localeCompare(a.data.update ?? ''),
 );
 
-// 从 markdown 正文提取纯文本，去掉图片/链接语法和多余空白，截取前 n 个字
+// Trích xuất văn bản thuần từ nội dung Markdown, loại bỏ cú pháp hình ảnh/liên kết và khoảng trắng thừa, lấy n ký tự đầu
 function excerpt(body: string | undefined, n = 20) {
   const text = (body ?? '')
-    .replace(/!\[.*?\]\(.*?\)/g, ' ')    // 图片语法
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1')  // 链接语法
+    .replace(/!\[.*?\]\(.*?\)/g, ' ')    // Loại bỏ cú pháp hình ảnh
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')  // Loại bỏ cú pháp liên kết
     .replace(/\s+/g, ' ')
     .trim();
   return text.length > n ? text.slice(0, n) + '…' : text;
@@ -19,12 +19,12 @@ function excerpt(body: string | undefined, n = 20) {
 ---
 
 <div class="max-w-2xl mx-auto px-6 pt-24 pb-16">
-  <p class="text-xs tracking-[0.3em] uppercase text-fg/30 mb-3">TALK / 碎碎念</p>
-  <h1 class="text-3xl font-bold mb-6">今日说法</h1>
+  <p class="text-xs tracking-[0.3em] uppercase text-fg/30 mb-3">TALK / SUY NGHĨ HÀNG NGÀY</p>
+  <h1 class="text-3xl font-bold mb-6">Góc chia sẻ</h1>
   <hr class="border-fg/10 mb-8" />
 
   {talks.length === 0 ? (
-    <p class="text-fg/50">还没有说说。</p>
+    <p class="text-fg/50">Chưa có bài chia sẻ nào.</p>
   ) : (
     <div class="flex flex-col gap-4">
       {talks.map((talk, i) => (
