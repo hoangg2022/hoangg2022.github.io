@@ -1,5 +1,5 @@
 ---
-//默认布局，所有页面都必须套上这个布局，不然壁纸和导航栏功能不能正常工作
+// Layout mặc định: Tất cả các trang đều phải sử dụng layout này để tính năng hình nền và thanh điều hướng hoạt động bình thường
 import '../styles/global.css';
 import { site } from '../site.config';
 import ThemeToggle from '../components/ThemeToggle.astro';
@@ -12,7 +12,7 @@ const {
   jsonLd,
 } = Astro.props;
 const pageTitle = title ? `${title} — ${site.name}` : site.defaultTitle;
-// SEO 使用的站点域名（site.url 留空时用占位域名）
+// Tên miền trang web dùng cho SEO (Nếu site.url trống sẽ dùng tên miền placeholder)
 const siteUrl = site.url || 'https://example.com';
 const currentPath = Astro.url.pathname;
 
@@ -23,14 +23,13 @@ function navClass(href: string) {
     : 'text-fg/60 hover:text-accent hover:bg-fg/5';
 }
 ---
- 
 
 <!doctype html>
-<html lang="zh">
+<html lang="vi">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-   
+    
     <meta name="description" content={ogDescription} />
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={pageTitle} />
@@ -44,16 +43,15 @@ function navClass(href: string) {
     <meta name="twitter:image" content={new URL(site.ogImage, siteUrl).href} />
     <link rel="canonical" href={new URL(Astro.url.pathname, siteUrl).href} />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
-   
+    
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>{pageTitle}</title>
 
   <script is:inline>
-  // 更改网页图标的配置代码在这里，默认使用favicon.png名字和格式图片， <link rel="icon" type="image/png" href="/favicon.png" />
- 
- 
-  // ===== 第一层：首屏防闪（FOUC）=====
-  // 必须在 head 里同步执行，在浏览器画第一帧之前设好主题
+  // Cấu hình thay đổi icon trang web ở đây (mặc định dùng favicon.png): <link rel="icon" type="image/png" href="/favicon.png" />
+  
+  // ===== Lớp 1: Chống nhấp nháy giao diện khi tải trang đầu (FOUC) =====
+  // Phải thực thi đồng bộ trong <head> để thiết lập theme trước khi trình duyệt render khung hình đầu tiên
   (function () {
     var stored = localStorage.getItem('theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -61,9 +59,8 @@ function navClass(href: string) {
     document.documentElement.setAttribute('data-theme', theme);
   })();
 
-  // ===== 第二层：ClientRouter 切页防闪 =====
-  // ClientRouter 导航后不重跑 inline 脚本，
-  // 必须监听 astro:after-swap 事件，在新页面渲染前重新设主题
+  // ===== Lớp 2: Chống nhấp nháy giao diện khi chuyển trang bằng ClientRouter =====
+  // ClientRouter điều hướng không chạy lại inline script, phải lắng nghe sự kiện astro:after-swap để cập nhật lại theme
   function applyTheme() {
     var stored = localStorage.getItem('theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -75,7 +72,7 @@ function navClass(href: string) {
   </head>
 
   <body class="bg-bg text-fg min-h-screen flex flex-col">
-    <!-- 全宽导航条：logo 在最左，导航+主题/壁纸在最右，中间留空 -->
+    <!-- Thanh điều hướng Header: Logo bên trái, Menu/Theme/Wallpaper bên phải -->
     <header class="sticky top-4 z-50">
       <div class="flex items-center justify-between w-full px-20 py-4
                   bg-bg/15 backdrop-blur-2xl
@@ -84,9 +81,9 @@ function navClass(href: string) {
                   max-md:gap-3 max-md:px-4 max-md:py-2 max-md:text-sm">
         <a href="/" class:list={['px-3 py-1.5 max-md:px-2.5 max-md:py-1 rounded-full transition-all duration-200', navClass('/')]}>{site.name}</a>
 
-        <!-- 右侧：桌面导航 + 主题/壁纸（整体靠右） -->
+        <!-- Bên phải: Navigation máy tính + Nút chuyển giao diện / hình nền -->
         <div class="flex items-center gap-1">
-          <!-- 桌面导航（md 及以上横排显示，仅导航链接） -->
+          <!-- Navigation máy tính (Màn hình md trở lên) -->
           <nav class="hidden md:flex items-center gap-1">
             {site.nav.map((item) => (
               <a href={item.href} class:list={['px-3 py-1.5 rounded-full transition-all duration-200', navClass(item.href)]}>{item.label}</a>
@@ -94,11 +91,11 @@ function navClass(href: string) {
           </nav>
           <ThemeToggle />
           <WallpaperPicker />
-          <!-- 汉堡按钮：仅手机显示 -->
+          <!-- Nút Hamburger Menu: Chỉ hiển thị trên thiết bị di động -->
           <button
             id="menu-btn"
             class="md:hidden p-1.5 rounded-full hover:bg-fg/10 transition-colors"
-            aria-label="打开菜单"
+            aria-label="Mở menu điều hướng"
             aria-expanded="false"
           >
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -109,7 +106,7 @@ function navClass(href: string) {
       </div>
     </header>
 
-    <!-- 手机端下拉菜单：放在 header 外，避免毛玻璃 backdrop-filter 影响 fixed 定位 -->
+    <!-- Menu xổ xuống trên thiết bị di động: Đặt ngoài header để tránh hiệu ứng backdrop-filter ảnh hưởng đến thuộc tính fixed -->
     <div
       id="mobile-menu"
       class="md:hidden fixed top-24 right-4 z-[60] w-56
@@ -130,7 +127,7 @@ function navClass(href: string) {
       ))}
     </div>
 
-    <!-- slot 是"页面内容插入的洞"：layout 提供外壳，页面的内容填进这里 -->
+    <!-- <slot /> là vị trí chèn nội dung của từng trang -->
     <main class="flex-1">
       <slot />
     </main>
@@ -139,7 +136,7 @@ function navClass(href: string) {
     </footer>
 
   <script>
-    // ===== 手机端汉堡菜单（事件委托 + 动态查询，ClientRouter 切页后依然有效） =====
+    // ===== Menu Hamburger trên di động (Event Delegation + Dynamic Query, duy trì hoạt động tốt với ClientRouter) =====
     let menuOpen = false;
 
     function getMenu() {
@@ -161,17 +158,17 @@ function navClass(href: string) {
 
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement | null;
-      // 点汉堡按钮：切换开合
+      // Nhấp nút hamburger: Bật / Tắt menu
       if (target?.closest('#menu-btn')) {
         setMenu(!menuOpen);
         return;
       }
-      // 点菜单里的链接：关闭
+      // Nhấp vào liên kết trong menu: Đóng menu
       if (target?.closest('#mobile-menu a')) {
         setMenu(false);
         return;
       }
-      // 点外部空白：关闭
+      // Nhấp ra ngoài vùng menu: Đóng menu
       if (menuOpen && !target?.closest('#mobile-menu')) {
         setMenu(false);
       }
