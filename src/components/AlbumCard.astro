@@ -1,7 +1,7 @@
 ---
-// 相册卡片组件：检测 src/assets/album/ 下的相册文件夹，三层叠加封面
-// 排序：按相册内最新一张照片的修改时间，倒序（最新在前）
-// 封面图构建时用 astro:assets 自动优化（600px webp）
+// Component thẻ album ảnh: Kiểm tra các thư mục album trong src/assets/album/, tạo hiệu ứng 3 lớp ảnh chồng lên nhau
+// Sắp xếp: Dựa theo thời gian chỉnh sửa của ảnh mới nhất trong album (mới nhất xếp trước)
+// Ảnh bìa được tối ưu tự động bằng astro:assets (định dạng webp, độ rộng 600px)
 import fs from 'node:fs';
 import path from 'node:path';
 import { getImage } from 'astro:assets';
@@ -11,7 +11,7 @@ import AnimateIn from './AnimateIn.astro';
 const albumRoot = path.join(process.cwd(), 'src', 'assets', 'album');
 const imageExt = /\.(jpg|jpeg|png|webp|gif|avif)$/i;
 
-// 动态导入所有相册图片（构建时静态分析，目录新增图片会自动包含）
+// Import động toàn bộ ảnh album (phân tích tĩnh khi build, tự động bao gồm khi thêm ảnh mới vào thư mục)
 const albumModules = import.meta.glob(
   '/src/assets/album/**/*.{jpg,jpeg,png,webp,gif,avif}',
   { eager: true },
@@ -19,7 +19,7 @@ const albumModules = import.meta.glob(
 
 let albums: { name: string; images: string[]; mtime: number }[] = [];
 
-// 如果 src/assets/album 目录不存在，直接返回空数组，保证构建成功
+// Nếu thư mục src/assets/album không tồn tại, trả về mảng rỗng để đảm bảo quá trình build không bị lỗi
 if (fs.existsSync(albumRoot)) {
   const dirs = fs.readdirSync(albumRoot, { withFileTypes: true })
     .filter((d) => d.isDirectory());
@@ -29,7 +29,7 @@ if (fs.existsSync(albumRoot)) {
     const images: string[] = [];
     let mtime = 0;
     for (const f of files) {
-      // 通过路径匹配找到对应的 ImageMetadata
+      // Khớp đường dẫn để tìm ImageMetadata tương ứng
       const key = Object.keys(albumModules).find((k) => k.includes(`/${d.name}/${f}`));
       const meta = key ? albumModules[key]?.default : undefined;
       if (meta) {
@@ -53,7 +53,7 @@ if (fs.existsSync(albumRoot)) {
 
 <div class="grid grid-cols-3 gap-4">
   {albums.length === 0 ? (
-    <p class="text-fg/50 col-span-3">还没有相册。</p>
+    <p class="text-fg/50 col-span-3">Chưa có album ảnh nào.</p>
   ) : (
     albums.map((album, i) => (
       <AnimateIn delay={i * 80}>
@@ -61,9 +61,9 @@ if (fs.existsSync(albumRoot)) {
           href={`/photo/${encodeURIComponent(album.name)}`}
           class="block group transition-all duration-300 hover:-translate-y-0.5"
         >
-          <!-- 透明容器：无磨砂背景，仅保留文字 -->
+          <!-- Khung chứa trong suốt: Giữ lại hiệu ứng chữ và ảnh -->
           <div class="p-3">
-            <!-- 三层叠加封面：第1张最上(0°)，第2张中层(20°)，第3张最下(-210°) -->
+            <!-- 3 lớp ảnh chồng lên nhau: Ảnh 1 ở trên cùng (0°), Ảnh 2 ở giữa (20°), Ảnh 3 ở dưới cùng (-210°) -->
             <div class="relative aspect-square">
               {album.images[2] && (
                 <img
@@ -96,12 +96,12 @@ if (fs.existsSync(albumRoot)) {
               )}
             </div>
 
-            <!-- 相册信息：相册名居中显示在照片框下方 -->
+            <!-- Thông tin Album: Tên album canh giữa nằm dưới khung ảnh -->
             <div class="mt-3 text-center px-1">
               <h2 class="text-base font-bold text-fg group-hover:text-accent transition-colors duration-200 truncate">
                 {album.name}
               </h2>
-              <span class="text-xs text-fg/40 font-mono block mt-0.5">{album.images.length} 张</span>
+              <span class="text-xs text-fg/40 font-mono block mt-0.5">{album.images.length} ảnh</span>
             </div>
           </div>
         </a>
