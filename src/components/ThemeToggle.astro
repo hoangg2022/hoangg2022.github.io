@@ -1,8 +1,8 @@
-<!-- 明暗主题切换按钮组件 -->
+<!-- Component nút chuyển đổi giao diện Sáng / Tối -->
 <button
   id="theme-toggle"
   class="p-1.5 rounded-full hover:bg-fg/10 transition-colors"
-  aria-label="切换明暗主题"
+  aria-label="Chuyển đổi giao diện sáng/tối"
 >
   <svg id="sun-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
     <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -27,11 +27,12 @@
     }
   }
 
-  // 初始化图标
+  // Khởi tạo trạng thái icon ban đầu
   const current = document.documentElement.getAttribute('data-theme');
   updateIcon(current);
 
-  // 事件委托：ClientRouter 切页会替换按钮节点，挂到 document 上更稳
+  // Event Delegation: Chuyển trang qua ClientRouter (View Transitions) sẽ thay thế DOM button,
+  // do đó lắng nghe sự kiện trên `document` sẽ đảm bảo hoạt động ổn định hơn.
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement | null;
     if (!target?.closest('#theme-toggle')) return;
@@ -40,11 +41,11 @@
     root.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
     updateIcon(next);
-    // 通知其他组件（如 WallpaperPicker）主题已切换
+    // Bắn CustomEvent thông báo cho các component khác (ví dụ: WallpaperPicker) biết giao diện đã được chuyển
     document.dispatchEvent(new CustomEvent('themechange', { detail: { theme: next } }));
   });
 
-  // 切页后新按钮的图标需要跟随当前主题
+  // Đồng bộ lại trạng thái icon trên nút mới sau khi Astro hoàn tất chuyển trang (after-swap)
   document.addEventListener('astro:after-swap', () => {
     updateIcon(document.documentElement.getAttribute('data-theme'));
   });
