@@ -1,5 +1,5 @@
 ---
-// 归档时间轴：左侧竖线 + 年份分组 + 可折叠展开，文章前带月日
+// Dòng thời gian lưu trữ: Đường kẻ dọc bên trái + Nhóm theo năm + Có thể thu gọn/mở rộng, hiển thị ngày tháng trước bài viết
 import { getCollection } from 'astro:content';
 import ReadFrostedGlass from './ReadFrostedGlass.astro';
 import AnimateIn from './AnimateIn.astro';
@@ -17,26 +17,27 @@ for (const post of posts) {
 const years = Object.keys(byYear).sort((a, b) => b.localeCompare(a));
 const latestYear = years[0];
 
+// Định dạng ngày/tháng theo chuẩn tiếng Việt (ví dụ: 15 thg 08)
 function formatMonthDay(dateStr: string) {
   const [, month, day] = dateStr.split('-');
-  return `${parseInt(month)}月${parseInt(day)}日`;
+  return `${parseInt(day)} thg ${parseInt(month)}`;
 }
 
-// 收集所有文章里出现过的唯一标签（用于归档页标签栏）
+// Thu thập toàn bộ các thẻ tag duy nhất xuất hiện trong các bài viết (dùng cho thanh lọc tag)
 const allTags = [...new Set(
   posts.flatMap((post) => post.data.tags ?? []),
 )].sort((a, b) => a.localeCompare(b));
 ---
 
 <div class="max-w-2xl mx-auto px-6 pt-24 pb-16">
-  <p class="text-xs tracking-[0.3em] uppercase text-fg/30 mb-3">TIMELINE / 时光轴</p>
-  <h1 class="text-3xl font-bold mb-6">归档</h1>
+  <p class="text-xs tracking-[0.3em] uppercase text-fg/30 mb-3">TIMELINE / DÒNG THỜI GIAN</p>
+  <h1 class="text-3xl font-bold mb-6">Lưu trữ bài viết</h1>
 
-  <!-- 搜索栏：按标题/标签即时过滤 -->
+  <!-- Thanh tìm kiếm: Lọc tức thì theo tiêu đề / thẻ tag -->
   <input
     id="archive-search"
     type="search"
-    placeholder="🔍 搜索文章标题或标签…"
+    placeholder="🔍 Tìm kiếm tiêu đề bài viết hoặc thẻ tag…"
     class="w-full px-4 py-2.5 rounded-xl text-sm
            bg-bg/60 border border-fg/10
            text-fg placeholder:text-fg/30
@@ -44,7 +45,7 @@ const allTags = [...new Set(
            transition-colors"
   />
 
-  <!-- 标签栏：自动收集所有文章标签，可多选 -->
+  <!-- Thanh thẻ tag: Tự động tổng hợp tag từ các bài viết, cho phép chọn nhiều tag -->
   {allTags.length > 0 && (
     <div id="archive-tags" class="flex flex-wrap gap-2 mt-4">
       {allTags.map((tag) => (
@@ -66,14 +67,14 @@ const allTags = [...new Set(
 
   <ReadFrostedGlass>
   {posts.length === 0 ? (
-    <p class="text-fg/50">还没有文章。</p>
+    <p class="text-fg/50">Chưa có bài viết nào.</p>
   ) : (
     <div class="relative">
-      <!-- 时间轴竖线 -->
+      <!-- Đường kẻ dọc thời gian -->
       <div class="absolute left-[13px] top-2 bottom-2 w-px bg-fg/10"></div>
 
       <div class="flex flex-col">
-        <p id="archive-empty" class="hidden text-fg/50 text-center py-10">没有找到相关文章。</p>
+        <p id="archive-empty" class="hidden text-fg/50 text-center py-10">Không tìm thấy bài viết phù hợp.</p>
         <style>
           summary::-webkit-details-marker{display:none}
           summary::marker{content:""}
@@ -89,11 +90,11 @@ const allTags = [...new Set(
               data-year={year}
               open={isLatest}
             >
-              {/* 年份摘要行：交互圆点（含箭头） + 年份 + 文章数 */}
+              {/* Dòng năm tổng quan: Nút tròn tương tác (có mũi tên) + Năm + Số lượng bài */}
               <summary class="flex items-center gap-6 cursor-pointer
                                py-3">
 
-                {/* 时间轴交互圆点 — 内含折叠箭头，点击展开/折叠 */}
+                {/* Nút tròn trên dòng thời gian — Có mũi tên thu gọn/mở rộng */}
                 <div class={`relative z-10 w-[26px] h-[26px] rounded-full shrink-0 border-2 flex items-center justify-center transition-all duration-300 ${
                   isLatest
                     ? 'bg-accent border-accent'
@@ -109,7 +110,7 @@ const allTags = [...new Set(
                   </svg>
                 </div>
 
-                {/* 年份 + 文章数 */}
+                {/* Năm + Số lượng bài viết */}
                 <span class={`text-xl font-semibold transition-colors duration-200 ${
                   isLatest ? 'text-accent' : 'text-accent/45'
                 }`}>
@@ -118,7 +119,7 @@ const allTags = [...new Set(
                 </span>
               </summary>
 
-              {/* 该年份下的文章列表（展开可见） */}
+              {/* Danh sách bài viết trong năm đó (mở ra khi nhấp vào năm) */}
               <div class="ml-[50px] mt-2 mb-8 flex flex-col gap-3">
                 {yearPosts.map((post) => (
                   <a
@@ -128,11 +129,11 @@ const allTags = [...new Set(
                     class="archive-item flex items-baseline gap-4 text-base leading-relaxed
                            text-fg/50 hover:text-accent transition-colors duration-200"
                   >
-                    <!-- 月日日期 -->
-                    <span class="text-sm text-fg/25 font-mono shrink-0 w-16 text-right">
+                    <!-- Ngày tháng (Ngày thg Tháng) -->
+                    <span class="text-sm text-fg/25 font-mono shrink-0 w-20 text-right">
                       {formatMonthDay(post.data.pubDate)}
                     </span>
-                    <!-- 标题 -->
+                    <!-- Tiêu đề bài viết -->
                     <span>{post.data.title}</span>
                   </a>
                 ))}
@@ -148,7 +149,7 @@ const allTags = [...new Set(
 </div>
 
 <script define:vars={{ allTags }}>
-  // ===== 归档搜索 + 多标签过滤（过滤现有 DOM，SEO 友好） =====
+  // ===== Tìm kiếm + Lọc đa thẻ tag cho Lưu trữ (Lọc trực tiếp trên DOM, tối ưu SEO) =====
   const searchInput = document.getElementById('archive-search');
   const tagBar = document.getElementById('archive-tags');
   const items = Array.from(document.querySelectorAll('.archive-item'));
@@ -161,9 +162,9 @@ const allTags = [...new Set(
   function matches(item) {
     const title = (item.dataset.title || '').toLowerCase();
     const tags = (item.dataset.tags || '').toLowerCase();
-    // 搜索词：命中标题或标签
+    // Từ khóa tìm kiếm: Khớp với tiêu đề hoặc thẻ tag
     if (query && !title.includes(query) && !tags.includes(query)) return false;
-    // 多标签：文章必须包含所有已选标签
+    // Đa thẻ tag: Bài viết phải chứa tất cả các thẻ tag đã chọn
     for (const t of selectedTags) {
       if (!tags.includes(t)) return false;
     }
@@ -177,14 +178,14 @@ const allTags = [...new Set(
       item.classList.toggle('hidden', !show);
       if (show) visibleCount++;
     }
-    // 年份组：该年内没有可见文章就整组隐藏（连同外层 AnimateIn 容器）
+    // Nhóm năm: Nếu không có bài viết nào hiển thị trong năm đó thì ẩn toàn bộ nhóm (bao gồm cả container AnimateIn)
     for (const group of yearGroups) {
       const anyVisible = Array.from(group.querySelectorAll('.archive-item'))
         .some((i) => !i.classList.contains('hidden'));
       const container = group.closest('.animate-in') || group;
       container.classList.toggle('hidden', !anyVisible);
     }
-    // 无结果提示
+    // Thông báo khi không tìm thấy kết quả
     if (emptyTip) emptyTip.classList.toggle('hidden', visibleCount > 0);
   }
 
@@ -199,15 +200,15 @@ const allTags = [...new Set(
     tagBar.addEventListener('click', (e) => {
       const btn = e.target.closest('.tag-btn');
       if (!btn) return;
-      // 统一转小写，与 matches() 里 dataset.tags 的小写比较保持一致
+      // Chuyển sang chữ thường để đồng bộ với so sánh dataset.tags
       const tag = (btn.dataset.tag || '').toLowerCase();
       if (selectedTags.has(tag)) {
-        // 取消选中
+        // Bỏ chọn tag
         selectedTags.delete(tag);
         btn.classList.remove('bg-accent', 'text-white', 'border-accent');
         btn.classList.add('bg-fg/5', 'text-fg/60', 'border-fg/10');
       } else {
-        // 选中
+        // Chọn tag
         selectedTags.add(tag);
         btn.classList.remove('bg-fg/5', 'text-fg/60', 'border-fg/10');
         btn.classList.add('bg-accent', 'text-white', 'border-accent');
