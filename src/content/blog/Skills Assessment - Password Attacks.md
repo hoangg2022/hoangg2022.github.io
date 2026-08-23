@@ -6,4 +6,3 @@ category: 'CPTS'             # optional
 tags: ['HTB', 'CPTS']      # optional
 ---
 
-Content here…
